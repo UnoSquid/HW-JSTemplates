@@ -8,14 +8,23 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 	<title></title>
-	<meta name="description" content="">
-	<meta name="author" content="">
+	<meta name="description" content="homework">
+	<meta name="author" content="John H. Pollman">
 
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 
 	<link rel="stylesheet" href="normalize.css" media="screen" />
 
 	<style type="text/css">
+		body {
+		}
+	
+		.wrapper {
+			width: 80%;
+			margin: auto;
+			padding: 10px;
+		}
+		
 		ul {
 			margin: 0;
 			padding: 0;
@@ -119,6 +128,85 @@
 	// YOUR JS GOES HERE
 	// here's the twitter URL template
 	// http://search.twitter.com/search.json?q=SEARCH_VALUE_HERE&rpp=20&include_entities=false&result_type=mixed
+	
+	$(document).ready(function(){
+		$('#search-button').click(function() {
+			$('#user-list').empty();
+			$('#tweet-list').empty();
+			$.ajax({
+				url: 'http://search.twitter.com/search.json?q=' + $('#search').val() + '&rpp=20&include_entities=false&result_type=mixed',
+				dataType: 'jsonp',
+				type: 'GET',
+				jsonpCallback: 'handle_tweets'
+			});
+		});
+	});
+	
+	function display_user(tweet){
+		/*var user_div = $('<div></div>');
+		user_div.addClass('user');
+		
+		var user_link = $('<a></a>');
+		user_link.attr('href', 'http://twitter.com/' + tweet.from_user);
+			
+		var user_img = $('<img></img>');
+		user_img.attr('src', tweet.profile_image_url);
+		
+		user_link.append(user_img);
+		user_div.append(user_link);
+		$('#user-list').append(user_div);
+			
+		return user_div;*/
+		
+		var user_div = ich.tweeter(tweet);
+		console.log(user_div);
+		$('#user-list').append(user_div);
+		
+		return user_div;
+	}
+	
+	function display_tweet(tweet){
+		/*user_div = display_user(tweet);
+		
+		var li = $('<li></li>');
+		li.addClass('tweet');
+		
+		li.append(user_div);
+		
+		var span = $('<span></span>');
+		span.text(tweet.text);
+		
+		li.append(span);
+		*/
+		
+		var li = ich.tweet(tweet);
+		$('#tweet-list').append(li);
+		
+		
+	}
+	
+	function handle_tweets(data) {
+		var tweet;
+		for (var i = 0; i < data.results.length; i++) {
+			tweet = data.results[i];
+			
+			display_user(tweet);
+			display_tweet(tweet);
+		}
+	}
+</script>
+
+<script type="text/html" id="tweeter">
+	<div class="user">
+		<a href="http://twitter.com/{{ from_user }}"><img src="{{ profile_image_url }}" alt=""/></a>
+	</div>
+</script>
+
+<script type="text/html" id="tweet">
+	<li class="tweet">
+		{{>tweeter}}
+		<span>{{text}}</span>
+	</li>
 </script>
 
 </body>
